@@ -1,0 +1,21 @@
+.idea
+/cmake-build-debug
+/cmake-build-release
+/logs
+/build
+*.log
+/solc-windows
+/solc-macos
+/generated
+/*.wasm
+/*.wat
+/test.db
+.DS_Store
+/.vscode
+
+# scan tmp
+/cov-analysis-*
+/tmp_build
+/idir
+/coverity-result.json
+/__MACOSX
