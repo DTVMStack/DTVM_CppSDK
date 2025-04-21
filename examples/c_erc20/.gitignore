@@ -1,0 +1,6 @@
+/*.wasm
+/*.o
+/*.wat
+/*.cbin
+/*.cbin.hex
+/test.db

@@ -1,0 +1,17 @@
+.idea
+/cmake-build-debug
+/cmake-build-release
+/logs
+/build
+*.log
+/solc-static-linux
+/solc-windows
+/solc-macos
+/generated
+/*.wasm
+/*.wat
+/*.cbin
+/*.cbin.hex
+/*.o
+/test.db
+/sol.output
