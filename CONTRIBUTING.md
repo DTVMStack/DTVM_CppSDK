@@ -2,10 +2,6 @@
 
 Thank you for considering contributing to DTVM_CppSDK! This document provides guidelines and instructions for contributing to this project.
 
-## Contributor License Agreement
-
-Before contributing to this project, please read and agree to our [Contributor License Agreement (CLA)](CLA.md). All contributors must accept the terms of this agreement before their contributions can be accepted.
-
 ## Code of Conduct
 
 Please be respectful and considerate of others when contributing to this project.

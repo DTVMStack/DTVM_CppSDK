@@ -53,8 +53,6 @@ bash test_in_mock_cli.sh
 
 Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
-All contributors must agree to our [Contributor License Agreement (CLA)](CLA.md) before their contributions can be accepted.
-
 ## License
 
 This project is licensed under the [LICENSE](LICENSE) file.
