@@ -1,0 +1,97 @@
+name: DTVM_CppSDK test CI
+
+on:
+  push:
+    paths:
+      - '**'
+permissions:
+    contents: read
+
+jobs:
+  build_test_on_x86:
+    name: Build and test DTVM_CppSDK on x86
+    runs-on: ubuntu-latest
+    container:
+      image: dtvmdev1/dtvm-cpp-dev-x64:main
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          submodules: "true"
+      - name: Run Tests
+        run: |
+          export CUR_PATH=$(pwd)
+          cd /opt
+          cp $CUR_PATH/tools/chain_mockcli/linux_x86/chain_mockcli-linux-ubuntu22.04-0.1.0.zip chain_mockcli.zip
+          unzip chain_mockcli.zip
+          chmod +x chain_mockcli
+
+          ./install_llvm16.sh
+          ./install_rust.sh
+          cd $CUR_PATH
+          export LLVM_SYS_160_PREFIX=/opt/llvm16
+          export LLVM_DIR=$LLVM_SYS_160_PREFIX/lib/cmake/llvm
+          export PATH=$LLVM_SYS_160_PREFIX/bin:$PATH
+
+          . "$HOME/.cargo/env"
+          export PATH=$HOME/.cargo/bin:$PATH
+          
+          rustup install 1.81.0
+          rustup default 1.81.0
+
+          ./tools/format.sh check
+
+          wget -O /opt/solc https://github.com/ethereum/solidity/releases/download/v0.8.29/solc-static-linux
+          chmod +x /opt/solc
+
+          export PATH=/opt:$PATH
+          cd $CUR_PATH
+
+          cd /opt/emsdk
+          ./emsdk activate 3.1.69
+          . "/opt/emsdk/emsdk_env.sh"
+          emcc --version
+
+          cd $CUR_PATH
+          ./tools/format.sh check
+
+          # build solidcpp
+          cd solidcpp
+          cargo build --release
+          cp target/release/solidcpp /opt/
+          export PATH=/opt:$PATH
+
+          # example1 test
+          cd $CUR_PATH/examples/example1
+          # build wasm
+          ./build_wasm.sh
+          ./test_in_mock_cli.sh
+
+          # erc20 test
+          cd $CUR_PATH/examples/erc20
+          # build wasm
+          ./build_wasm.sh
+          ./test_in_mock_cli.sh
+
+          # unit test
+          # prepare cpp test framework
+          cd $CUR_PATH
+          wget -O googletest-1.15.2.tar.gz https://github.com/google/googletest/releases/download/v1.15.2/googletest-1.15.2.tar.gz
+          tar -xzvf googletest-1.15.2.tar.gz
+          mv googletest-1.15.2 cpp_tests/googletest
+
+          # code format check
+          make fmt_check
+
+          # run unit tests
+          cd $CUR_PATH/cpp_tests
+          cmake -S . -B build
+          cmake --build build -j6
+          cd build && ./runUnitTests
+
+          cd $CUR_PATH
+
+          # build solidcpp
+          cd solidcpp
+          cargo test -- --nocapture
