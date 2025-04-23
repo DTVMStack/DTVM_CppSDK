@@ -5,6 +5,14 @@ How to use
 
 Currently, it is recommended to use Ubuntu 22.04 environment, or you can use Docker.
 
+# Docker image
+
+The fastest way to set up the compilation environment is to use a Docker image or build it based on docker/Dockerfile.
+
+```
+docker pull dtvmdev1/dtvm-cpp-dev-x64:main
+```
+
 # Installing Dependencies
 
 * Install git, python3, xz
