@@ -27,8 +27,9 @@ jobs:
           unzip chain_mockcli.zip
           chmod +x chain_mockcli
 
-          ./install_llvm16.sh
-          ./install_rust.sh
+          # install rust
+          /opt/install_rust.sh
+
           cd $CUR_PATH
           export LLVM_SYS_160_PREFIX=/opt/llvm16
           export LLVM_DIR=$LLVM_SYS_160_PREFIX/lib/cmake/llvm
@@ -36,14 +37,8 @@ jobs:
 
           . "$HOME/.cargo/env"
           export PATH=$HOME/.cargo/bin:$PATH
-          
-          rustup install 1.81.0
-          rustup default 1.81.0
 
           ./tools/format.sh check
-
-          wget -O /opt/solc https://github.com/ethereum/solidity/releases/download/v0.8.29/solc-static-linux
-          chmod +x /opt/solc
 
           export PATH=/opt:$PATH
           cd $CUR_PATH
@@ -77,7 +72,7 @@ jobs:
           # unit test
           # prepare cpp test framework
           cd $CUR_PATH
-          wget -O googletest-1.15.2.tar.gz https://github.com/google/googletest/releases/download/v1.15.2/googletest-1.15.2.tar.gz
+          cp /opt/googletest-1.15.2.tar.gz .
           tar -xzvf googletest-1.15.2.tar.gz
           mv googletest-1.15.2 cpp_tests/googletest
 
