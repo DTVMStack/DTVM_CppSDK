@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Ant Group Co., Ltd. All Rights Reserved.
+// Copyright (C) 2024-2025 the DTVM authors. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
 use crate::commands::sol_types_utils::transform_solidity_storage_type_to_cpp;

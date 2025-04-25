@@ -1,4 +1,4 @@
-// Copyright (C) 2024-2025 Ant Group Co., Ltd. All Rights Reserved.
+// Copyright (C) 2024-2025 the DTVM authors. All Rights Reserved.
 // SPDX-License-Identifier: Apache-2.0
 
 pub fn with_prefix_comma_if_not_empty(s: &str) -> String {
