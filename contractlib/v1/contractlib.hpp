@@ -2,6 +2,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #pragma once
+
+// Version information
+#define DTVM_CPP_SDK_VERSION_MAJOR 0
+#define DTVM_CPP_SDK_VERSION_MINOR 1
+#define DTVM_CPP_SDK_VERSION_PATCH 0
+#define DTVM_CPP_SDK_VERSION_STRING "0.1.0"
+
 #include "encoding.hpp"
 #include "hostio.hpp"
 #include "math.hpp"
