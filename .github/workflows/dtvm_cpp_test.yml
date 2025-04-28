@@ -2,15 +2,11 @@ name: DTVM_CppSDK test CI
 
 on:
   push:
-    paths:
-      - 'contractlib/**'
-      - '.github/workflow/dtvm_cpp_test.yml'
-      - 'cpp_tests/**'
-      - 'examples/**'
-      - 'solidcpp/**'
-      - 'tools/**'
-      - 'build_lib.sh'
-      - 'Makefile'
+    paths-ignore:
+      - 'docker/**'
+      - "docs/**"
+      - "*.md"
+      - ".gitignore"
 permissions:
     contents: read
 
