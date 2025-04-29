@@ -1,0 +1,51 @@
+name: DTVM_CppSDK Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*' # Trigger on version tags like v1.0.0
+
+permissions:
+  contents: write # Needed to create releases/upload artifacts
+
+jobs:
+  build_release_and_upload:
+    name: Build, Create Release, and Upload Artifact
+    runs-on: ubuntu-latest
+    container:
+      image: dtvmdev1/dtvm-cpp-dev-x64:main # Use the same dev container
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          submodules: "true"
+
+      - name: Run package script
+        run: |
+          export CUR_PATH=$(pwd)
+          # Make package script executable
+          chmod +x .ci/package.sh
+          # Run the package script
+          .ci/package.sh
+          # The script creates DTVM_CppSDK.nightly.latest.tar.gz in tmp_build
+
+      - name: Prepare Release Artifact
+        id: prepare_artifact
+        run: |
+          cd tmp_build
+          RELEASE_VERSION=${{ github.ref_name }}
+          ARTIFACT_NAME="DTVM_CppSDK.${RELEASE_VERSION}.tar.gz"
+          mv DTVM_CppSDK.nightly.latest.tar.gz "${ARTIFACT_NAME}"
+          echo "artifact_path=$(pwd)/${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
+          echo "artifact_name=${ARTIFACT_NAME}" >> $GITHUB_OUTPUT
+          cd ..
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.prepare_artifact.outputs.artifact_path }}
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body: "Release for DTVM C++ SDK version ${{ github.ref_name }}"
+          prerelease: true # Set to true if you want pre-releases 

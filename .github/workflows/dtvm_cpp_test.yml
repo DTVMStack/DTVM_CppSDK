@@ -7,6 +7,12 @@ on:
       - "docs/**"
       - "*.md"
       - ".gitignore"
+  pull_request:
+    paths-ignore:
+      - 'docker/**'
+      - "docs/**"
+      - "*.md"
+      - ".gitignore"
 permissions:
     contents: read
 

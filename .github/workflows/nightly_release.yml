@@ -1,0 +1,37 @@
+name: DTVM_CppSDK Nightly Release
+
+on:
+    workflow_dispatch:
+      paths:
+        - '**'
+
+permissions:
+  contents: write # Needed to create releases/upload artifacts
+
+jobs:
+  build_and_package:
+    name: Build and Package DTVM_CppSDK Nightly
+    runs-on: ubuntu-latest
+    container:
+      image: dtvmdev1/dtvm-cpp-dev-x64:main # Use the same dev container as the test workflow
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          submodules: "true"
+
+      - name: Run package script
+        run: |
+          export CUR_PATH=$(pwd)
+          # Make package script executable
+          chmod +x .ci/package.sh
+          # Run the package script
+          .ci/package.sh
+          # The script should create DTVM_CppSDK.nightly.latest.tar.gz in tmp_build
+
+      - name: Upload Nightly Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dtvm-cppsdk-nightly-latest
+          path: tmp_build/DTVM_CppSDK.nightly.latest.tar.gz 
