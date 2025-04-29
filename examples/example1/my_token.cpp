@@ -28,7 +28,7 @@ abstract contract MyToken is ITokenService {
 
   function testGetValue(uint256 value) public virtual payable;
 
-  event Transfer(address from, address to, uint256 amount);
+  event Transfer(address indexed from, address to, uint256 amount);
 }
 
 )""")
