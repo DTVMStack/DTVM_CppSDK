@@ -99,15 +99,21 @@ public:
             let mut args_cpp_buf: String = "".to_string(); // Function signature parameter part
             let mut args_decode_cpp_buf: String = "".to_string(); // Decoding parameters section
             let mut call_abi_args_cpp_buf: String = "".to_string(); // , arg0, arg1, ... part in xxx(msg, arg0, arg1, ...). Each parameter is a variable decoded from the function body.
+                                                                    // not include event indexed fields
             let mut all_params_name_list_cpp_buf: String = "".to_string(); // Comma-separated list of function parameters
+            let mut indexed_event_fields_param_names: Vec<String> = vec![];
 
             let mut abi_method_signature: String = format!("{abi_name}(");
 
             for (input_index, input) in inputs.iter().enumerate() {
+                let indexed = input["indexed"].as_bool().unwrap_or(false);
+
                 if input_index > 0 {
                     args_cpp_buf += ", ";
                     call_abi_args_cpp_buf += ", ";
-                    all_params_name_list_cpp_buf += ", ";
+                    if !indexed {
+                        all_params_name_list_cpp_buf += ", ";
+                    }
                     abi_method_signature += ",";
                 }
 
@@ -142,8 +148,17 @@ public:
                     "{arg_type_in_cpp} arg{input_index} = input.read<{arg_type_in_cpp}>();\n        "
                 );
                 call_abi_args_cpp_buf += &format!("arg{input_index}");
-                all_params_name_list_cpp_buf += &arg_name;
+                if !indexed {
+                    all_params_name_list_cpp_buf += &arg_name;
+                } else {
+                    indexed_event_fields_param_names.push(arg_name.clone());
+                }
             }
+            all_params_name_list_cpp_buf = all_params_name_list_cpp_buf
+                .trim()
+                .trim_start_matches(",")
+                .parse()
+                .unwrap();
 
             abi_method_signature += ")";
             // calculate selector(uint32)
@@ -216,14 +231,30 @@ protected:
                         let b_str = format!("{b}");
                         event_topic_cpp_code += &b_str;
                     }
-                    // TODO: Each indexed event field should also be added to topics, not to data
+                    let mut topics_set_code = format!(
+                        r#"
+      const std::vector <uint8_t> topic0 = {{ {event_topic_cpp_code} }}; // {selector}, {abi_method_signature}
+                    "#
+                    );
+                    let mut topics_vars_array_code = "{topic0".to_string();
+                    // other indexed event fields
+                    for indexed_field_param_name in indexed_event_fields_param_names {
+                        topics_set_code += &format!(
+                            r#"
+      const std::vector<uint8_t> topic_{indexed_field_param_name} = dtvm::abi_encode({indexed_field_param_name});
+                    "#
+                        );
+                        topics_vars_array_code += &format!(", topic_{indexed_field_param_name}");
+                    }
+                    topics_vars_array_code += "}";
+
                     cls_buf += &format!(
                         r#"
 protected:
   inline void emit{abi_name}({args_cpp_buf}) {{
-      const std::vector <uint8_t> topic1 = {{ {event_topic_cpp_code} }}; // {selector}, {abi_method_signature}
+      {topics_set_code}
       const std::vector <uint8_t> data = dtvm::abi_encode(std::make_tuple({all_params_name_list_cpp_buf}));
-      dtvm::hostio::emit_log({{topic1}}, data);
+      dtvm::hostio::emit_log({topics_vars_array_code}, data);
   }}
 "#
                     );
